@@ -1,0 +1,56 @@
+// Define the graph
+int[][] graph = new int[][] {
+    {0, 2, 0, 6, 0},
+    {2, 0, 3, 8, 5},
+    {0, 3, 0, 0, 7},
+    {6, 8, 0, 0, 9},
+    {0, 5, 7, 9, 0}
+};
+
+// Define the oracle
+int[] oracle = new int[] {1, 1, -1, -1, -1};
+
+// Define the diffusion operator
+int[][] diffusion = new int[][] {
+    {-4, 2, 2, 2, 2},
+    {2, -4, 2, 2, 2},
+    {2, 2, -4, 2, 2},
+    {2, 2, 2, -4, 2},
+    {2, 2, 2, 2,-4}
+};
+
+// Define the number of iterations
+int iterations = (int) Math.round(Math.PI / (4 * Math.asin(1 / Math.sqrt(5))));
+
+// Apply Grover's algorithm
+for (int i = 0; i < iterations; i++) {
+    // Apply oracle
+    for (int j = 0; j < oracle.length; j++) {
+        if (oracle[j] == -1) {
+            graph[j] = negate(graph[j]);
+        }
+    }
+
+    // Apply diffusion operator
+    graph = matrixMultiply(diffusion, graph);
+}
+
+// Find the minimum spanning tree
+int[] mst = new int[graph.length];
+for (int i = 0; i < mst.length; i++) {
+    mst[i] = -1;
+}
+
+mst[0] = 0;
+for (int i = 1; i < graph.length; i++) {
+    int minIndex = -1;
+    for (int j = 0; j < graph.length; j++) {
+        if (mst[j] == -1 && (minIndex == -1 || graph[j][mst[minIndex]] < graph[minIndex][mst[minIndex]])) {
+            minIndex = j;
+        }
+    }
+    mst[minIndex] = i;
+}
+
+// Print the minimum spanning tree
+System.out.println(Arrays.toString(mst));
